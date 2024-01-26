@@ -1,5 +1,5 @@
 function isWindows(openedFilename) {
-  return openedFilename.includes('\\');
+  return openedFilename.includes("\\");
 }
 
 const isFolder = (openedFilename, folderName) => {
@@ -10,15 +10,15 @@ const isFolder = (openedFilename, folderName) => {
 };
 
 function isTestFile(openedFilename) {
-  return openedFilename.includes('_test.exs');
+  return openedFilename.includes("test.exs");
 }
 
 function isUmbrella(openedFilename) {
-  return isFolder(openedFilename, 'apps');
+  return isFolder(openedFilename, "apps");
 }
 
 function isTestFolder(openedFilename) {
-  return isFolder(openedFilename, 'test');
+  return isFolder(openedFilename, "test");
 }
 
 function isCodeFile(openedFilename) {

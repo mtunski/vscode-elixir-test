@@ -1,5 +1,5 @@
-const vscode = require('vscode');
-const validations = require('../helpers/validations');
+const vscode = require("vscode");
+const validations = require("../helpers/validations");
 
 function openFile(file) {
   return vscode.workspace
@@ -33,7 +33,7 @@ async function createNewTestFile(dir, file) {
   ws.insert(
     uriFile,
     new vscode.Position(0, 0),
-    `defmodule ${moduleName}Test do\n\tuse ExUnit.Case\n\tdoctest ${moduleName}\n\talias ${moduleName}\n\nend`,
+    `defmodule ${moduleName}Test do\n\tuse ExUnit.Case\n\tdoctest ${moduleName}\n\talias ${moduleName}\n\nend`
   );
 
   await vscode.workspace.applyEdit(ws);
@@ -42,9 +42,9 @@ async function createNewTestFile(dir, file) {
 function askToCreateANewFile(dir, file) {
   return showConfirmationDialog(
     `Create the test file at ${dir}?`,
-    'Create',
+    "Create"
   ).then((answer) => {
-    if (answer === 'Create') {
+    if (answer === "Create") {
       createNewTestFile(dir, file).then(() => {
         openFile(`${dir}${file}`);
       });
@@ -70,32 +70,61 @@ function handler() {
   const testOrLib = openedFile[2];
   const postDir = openedFile[3];
   const fileName = openedFile[4];
-  const replacedLibOrTest = testOrLib === 'lib' ? 'test' : 'lib';
-  let newFilename = '';
 
-  if (fileName.includes('_test')) {
-    const strippedFileName = fileName.replace('_test', '');
-    newFilename = `${strippedFileName}.ex`;
-  } else {
-    newFilename = `${fileName}_test.exs`;
-  }
+  if (testOrLib === "lib") {
+    let newFilename = "";
 
-  const fileToOpen = vscode.workspace.asRelativePath(
-    startDir + replacedLibOrTest + postDir + newFilename,
-    false
-  );
-
-  vscode.workspace.findFiles(fileToOpen, '**/.elixir_ls/**').then((files) => {
-    if (!files.length) {
-      askToCreateANewFile(startDir + replacedLibOrTest + postDir, newFilename);
+    if (fileName.includes(".test")) {
+      const strippedFileName = fileName.replace(".test", "");
+      newFilename = `${strippedFileName}.ex`;
     } else {
-      const file = files[0].fsPath;
-      openFile(file);
+      newFilename = `${fileName}.test.exs`;
     }
-  });
+
+    const fileToOpen = vscode.workspace.asRelativePath(
+      startDir + testOrLib + postDir + newFilename,
+      false
+    );
+
+    vscode.workspace.findFiles(fileToOpen, "**/.elixir_ls/**").then((files) => {
+      if (!files.length) {
+        askToCreateANewFile(startDir + testOrLib + postDir, newFilename);
+      } else {
+        const file = files[0].fsPath;
+        openFile(file);
+      }
+    });
+  } else {
+    const replacedLibOrTest = testOrLib === "lib" ? "test" : "lib";
+    let newFilename = "";
+
+    if (fileName.includes("_test")) {
+      const strippedFileName = fileName.replace("_test", "");
+      newFilename = `${strippedFileName}.ex`;
+    } else {
+      newFilename = `${fileName}_test.exs`;
+    }
+
+    const fileToOpen = vscode.workspace.asRelativePath(
+      startDir + replacedLibOrTest + postDir + newFilename,
+      false
+    );
+
+    vscode.workspace.findFiles(fileToOpen, "**/.elixir_ls/**").then((files) => {
+      if (!files.length) {
+        askToCreateANewFile(
+          startDir + replacedLibOrTest + postDir,
+          newFilename
+        );
+      } else {
+        const file = files[0].fsPath;
+        openFile(file);
+      }
+    });
+  }
 }
 
 module.exports = {
-  name: 'extension.elixirJumpToTest',
+  name: "extension.elixirJumpToTest",
   handler,
 };
